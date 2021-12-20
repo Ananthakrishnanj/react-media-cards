@@ -49,6 +49,8 @@ export default function App() {
   ];
 
   const [activeMedias, setActiveMedias] = useState(media);
+  const [touchStart, setTouchStart] = useState(0);
+  const [touchEnd, setTouchEnd] = useState(0);
   const noOfCards = 4;
   const arrayRotate = (arr, count = 1) => {
     return [...arr.slice(count, arr.length), ...arr.slice(0, count)];
@@ -67,7 +69,17 @@ export default function App() {
   return (
     <>
       <div className="App">
-        <TransitionGroup>
+        <TransitionGroup
+          onTouchStart={(e) => setTouchStart(e.targetTouches[0].clientX)}
+          onTouchMove={(e) => setTouchEnd(e.targetTouches[0].clientX)}
+          onTouchEnd={() => {
+            if (touchStart - touchEnd > 100) {
+              setActiveMedias((activeMedia) => arrayRotate(activeMedia, 1));
+            } else if (touchStart - touchEnd < -100) {
+              setActiveMedias((activeMedia) => arrayRotate(activeMedia, -1));
+            }
+          }}
+        >
           {activeMedias
             .filter((_, index) => index <= 3)
             .map((item, index) => (
